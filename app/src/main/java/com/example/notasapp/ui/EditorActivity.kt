@@ -1,17 +1,13 @@
 package com.example.notasapp.ui
 
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
-import android.widget.ImageButton
+import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.example.notasapp.R
 import com.example.notasapp.databinding.ActivityEditorBinding
 import com.example.notasapp.viewmodel.NotaViewModel
-import jp.wasabeef.richeditor.RichEditor
 import kotlinx.coroutines.launch
 
 class EditorActivity : AppCompatActivity() {
@@ -21,12 +17,8 @@ class EditorActivity : AppCompatActivity() {
     private var notaId: Long = -1
     private var isEditMode = false
 
-    // Estado original para detectar cambios
     private var originalTitulo: String = ""
     private var originalContenido: String = ""
-
-    // Timer para evitar actualizaciones demasiado frecuentes
-    private var lastSelectionChangeTime = 0L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,24 +28,38 @@ class EditorActivity : AppCompatActivity() {
         notaId = intent.getLongExtra("NOTA_ID", -1)
         isEditMode = notaId != -1L
 
-        setupToolbar()
-        setupRichEditor()
-        setupEditorButtons()
+        setupTopBar()
+        binding.loadingProgress.visibility = View.VISIBLE
 
-        if (isEditMode) {
-            cargarNota()
+        binding.root.post {
+            setupRichEditor()
+            setupEditorButtons()
+
+            if (isEditMode) {
+                cargarNota()
+            }
+            binding.loadingProgress.visibility = View.GONE
         }
     }
 
-    private fun setupToolbar() {
-        setSupportActionBar(binding.toolbar)
-        supportActionBar?.apply {
-            setDisplayHomeAsUpEnabled(true)
-            title = if (isEditMode) "Editar nota" else "Nueva nota"
+    private fun setupTopBar() {
+        // Botón de retroceso
+        binding.backButton.setOnClickListener {
+            onBackPressedDispatcher.onBackPressed()
         }
 
-        binding.toolbar.setNavigationOnClickListener {
-            onBackPressed()
+        // Botón de guardar
+        binding.saveButton.setOnClickListener {
+            guardarNota()
+        }
+
+        // Botón de eliminar
+        binding.deleteButton.setOnClickListener {
+            if (isEditMode) {
+                mostrarDialogoEliminar()
+            } else {
+                Toast.makeText(this, "No hay nota para eliminar", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -61,59 +67,33 @@ class EditorActivity : AppCompatActivity() {
         binding.richEditor.apply {
             setEditorHeight(200)
             setEditorFontSize(16)
-            setPadding(16, 16, 16, 16)
             setPlaceholder("Escribe tu nota aquí...")
-
-            // Fondo transparente
             setBackgroundColor(android.graphics.Color.TRANSPARENT)
 
-            // Cambiar color de texto según el tema
-            val nightModeFlags = resources.configuration.uiMode and
-                    android.content.res.Configuration.UI_MODE_NIGHT_MASK
-            when (nightModeFlags) {
-                android.content.res.Configuration.UI_MODE_NIGHT_YES -> {
-                    // Modo oscuro: texto blanco
-                    setEditorFontColor(android.graphics.Color.WHITE)
-                }
-                android.content.res.Configuration.UI_MODE_NIGHT_NO,
-                android.content.res.Configuration.UI_MODE_NIGHT_UNDEFINED -> {
-                    // Modo claro: texto negro
-                    setEditorFontColor(android.graphics.Color.BLACK)
-                }
-            }
+            // Simplifica la detección de modo oscuro
+            val isNightMode = (resources.configuration.uiMode and
+                    android.content.res.Configuration.UI_MODE_NIGHT_MASK) ==
+                    android.content.res.Configuration.UI_MODE_NIGHT_YES
 
-            // Listener para detectar cambios en la selección usando JavaScript
+            setEditorFontColor(if (isNightMode) android.graphics.Color.WHITE else android.graphics.Color.BLACK)
+
             setOnTextChangeListener {
-                // Actualizar estados después de un pequeño delay para asegurar que la selección está lista
-                binding.richEditor.postDelayed({
-                    updateButtonStates()
-                }, 50)
+                // Reduce el delay
+                binding.richEditor.postDelayed({ updateButtonStates() }, 100)
             }
         }
     }
 
     private fun setupEditorButtons() {
-        // Formato de texto - ahora con manejo de estado correcto
+        // Formato de texto
         binding.boldButton.setOnClickListener {
             binding.richEditor.setBold()
-            // Actualizar estado después de un pequeño delay
-            binding.richEditor.postDelayed({
-                updateButtonStates()
-            }, 50)
+            binding.richEditor.postDelayed({ updateButtonStates() }, 50)
         }
 
         binding.italicButton.setOnClickListener {
             binding.richEditor.setItalic()
-            binding.richEditor.postDelayed({
-                updateButtonStates()
-            }, 50)
-        }
-
-        binding.underlineButton.setOnClickListener {
-            binding.richEditor.setUnderline()
-            binding.richEditor.postDelayed({
-                updateButtonStates()
-            }, 50)
+            binding.richEditor.postDelayed({ updateButtonStates() }, 50)
         }
 
         // Alineación
@@ -142,23 +122,23 @@ class EditorActivity : AppCompatActivity() {
             binding.justifyButton.isSelected = true
         }
 
-        // Agregar listener de clic al editor para detectar cambios de selección
+        // Botón de texto normal (quita todos los formatos)
+        binding.normalTextButton.setOnClickListener {
+            binding.richEditor.removeFormat()
+            binding.richEditor.postDelayed({ updateButtonStates() }, 50)
+        }
+
         binding.richEditor.setOnClickListener {
             updateButtonStates()
         }
     }
 
-    /**
-     * Actualiza el estado de los botones de formato usando JavaScript
-     */
     private fun updateButtonStates() {
-        // Consultar el estado de formato usando JavaScript
         val jsCode = """
             (function() {
                 var result = {
                     bold: document.queryCommandState('bold'),
                     italic: document.queryCommandState('italic'),
-                    underline: document.queryCommandState('underline'),
                     justifyLeft: document.queryCommandState('justifyLeft'),
                     justifyCenter: document.queryCommandState('justifyCenter'),
                     justifyRight: document.queryCommandState('justifyRight'),
@@ -171,17 +151,13 @@ class EditorActivity : AppCompatActivity() {
         binding.richEditor.evaluateJavascript(jsCode) { result ->
             runOnUiThread {
                 try {
-                    // Remover las comillas extras que pueda tener el resultado
                     val cleanResult = result?.removeSurrounding("\"")?.replace("\\\"", "\"")
                     if (cleanResult != null && cleanResult != "null") {
                         val jsonObject = org.json.JSONObject(cleanResult)
 
-                        // Actualizar botones de formato de texto
                         binding.boldButton.isSelected = jsonObject.optBoolean("bold", false)
                         binding.italicButton.isSelected = jsonObject.optBoolean("italic", false)
-                        binding.underlineButton.isSelected = jsonObject.optBoolean("underline", false)
 
-                        // Actualizar botones de alineación
                         updateAlignmentButtonState(
                             jsonObject.optBoolean("justifyLeft", false),
                             jsonObject.optBoolean("justifyCenter", false),
@@ -189,21 +165,16 @@ class EditorActivity : AppCompatActivity() {
                             jsonObject.optBoolean("justifyFull", false)
                         )
                     } else {
-                        // Si no hay selección o resultado, desactivar todos los botones
                         resetAllFormatButtons()
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    // En caso de error, desactivar todos los botones
                     resetAllFormatButtons()
                 }
             }
         }
     }
 
-    /**
-     * Actualiza el estado de los botones de alineación
-     */
     private fun updateAlignmentButtonState(
         justifyLeft: Boolean,
         justifyCenter: Boolean,
@@ -217,10 +188,6 @@ class EditorActivity : AppCompatActivity() {
             justifyCenter -> binding.alignCenterButton.isSelected = true
             justifyRight -> binding.alignRightButton.isSelected = true
             justifyFull -> binding.justifyButton.isSelected = true
-            else -> {
-                // Si no hay alineación específica, no seleccionar ningún botón
-                // o podrías considerar left como default si prefieres
-            }
         }
     }
 
@@ -234,7 +201,6 @@ class EditorActivity : AppCompatActivity() {
     private fun resetAllFormatButtons() {
         binding.boldButton.isSelected = false
         binding.italicButton.isSelected = false
-        binding.underlineButton.isSelected = false
         resetAlignmentButtons()
     }
 
@@ -243,16 +209,15 @@ class EditorActivity : AppCompatActivity() {
             val nota = viewModel.getNotaById(notaId)
             nota?.let {
                 binding.tituloEditText.setText(it.titulo)
-                binding.richEditor.html = it.contenido
 
-                // Guardar estado original
                 originalTitulo = it.titulo
                 originalContenido = it.contenido
 
-                // Actualizar el estado de los botones después de cargar el contenido
-                binding.richEditor.postDelayed({
-                    updateButtonStates()
-                }, 100)
+                // Cargar HTML después de que el editor esté completamente listo
+                binding.richEditor.post {
+                    binding.richEditor.html = it.contenido
+                    binding.richEditor.postDelayed({ updateButtonStates() }, 200)
+                }
             }
         }
     }
@@ -275,35 +240,61 @@ class EditorActivity : AppCompatActivity() {
                     Toast.makeText(this, "Nota guardada", Toast.LENGTH_SHORT).show()
                     notaId = id
                     isEditMode = true
-                    supportActionBar?.title = "Editar nota"
                 }
             }
         }
 
-        // Actualizamos el estado original después de guardar
         originalTitulo = titulo
         originalContenido = contenido
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu_editor, menu)
-        return true
+    private fun mostrarDialogoEliminar() {
+        androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle("Eliminar nota")
+            .setMessage("¿Estás seguro de que quieres eliminar esta nota?")
+            .setPositiveButton("Eliminar") { _, _ ->
+                lifecycleScope.launch {
+                    val nota = viewModel.getNotaById(notaId)
+                    nota?.let {
+                        viewModel.deleteNota(it)
+                        Toast.makeText(this@EditorActivity, "Nota eliminada", Toast.LENGTH_SHORT).show()
+                        finish()
+                    }
+                }
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.action_save -> {
-                guardarNota()
-                true
+    override fun onPause() {
+        super.onPause()
+        autoGuardarNota()
+    }
+
+    private fun autoGuardarNota() {
+        val titulo = binding.tituloEditText.text.toString().trim()
+        val contenido = binding.richEditor.html ?: ""
+
+        // No guardes si está vacío
+        if (titulo.isEmpty() && contenido.isEmpty()) return
+
+        // No guardes si no cambió nada
+        if (titulo == originalTitulo && contenido == originalContenido) return
+
+        if (isEditMode) {
+            viewModel.updateNota(notaId, titulo, contenido)
+        } else {
+            viewModel.insertNota(titulo, contenido) { id ->
+                notaId = id
+                isEditMode = true
             }
-            android.R.id.home -> {
-                onBackPressed()
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
         }
+
+        originalTitulo = titulo
+        originalContenido = contenido
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
         val tituloActual = binding.tituloEditText.text.toString().trim()
         val contenidoActual = binding.richEditor.html ?: ""

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Colores base -->
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>
@@ -8,9 +9,15 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <!-- Liquid Glass Colors -->
+    <!-- Colores glass effect -->
     <color name="glass_background">#1AFFFFFF</color>
     <color name="glass_stroke">#33FFFFFF</color>
-    <color name="glass_background_dark">#1A000000</color>
-    <color name="glass_stroke_dark">#33000000</color>
+
+    <!-- Colores para buscador - MODO CLARO -->
+    <color name="search_background">#F5F5F5</color>
+    <color name="search_border">#E0E0E0</color>
+
+    <!-- Colores para botones del editor - MODO CLARO -->
+    <color name="editor_button_selected">#E0E0E0</color>
+    <color name="editor_button_pressed">#F5F5F5</color>
 </resources>

@@ -1,19 +1,24 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Theme.NotasApp" parent="Theme.Material3.DayNight">
-        <!-- Primary brand color. -->
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.NotasApp" parent="Theme.Material3.Dark.NoActionBar">
+        <!-- Colores primarios -->
         <item name="colorPrimary">@color/purple_200</item>
         <item name="colorPrimaryVariant">@color/purple_700</item>
         <item name="colorOnPrimary">@color/black</item>
-        <!-- Secondary brand color. -->
+
+        <!-- Colores secundarios -->
         <item name="colorSecondary">@color/teal_200</item>
         <item name="colorSecondaryVariant">@color/teal_200</item>
         <item name="colorOnSecondary">@color/black</item>
-        <!-- Status bar color. -->
-        <item name="android:statusBarColor">?attr/colorSurfaceVariant</item>
+
+        <!-- Colores de superficie -->
+        <item name="colorSurface">#121212</item>
+        <item name="colorOnSurface">@color/white</item>
+        <item name="colorOnSurfaceVariant">#AAAAAA</item>
+        <item name="colorOutline">#666666</item>
+
+        <!-- Status bar -->
+        <item name="android:statusBarColor">#121212</item>
         <item name="android:windowLightStatusBar">false</item>
-        <!-- Customize your theme here. -->
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
     </style>
 </resources>

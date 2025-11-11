@@ -2,6 +2,7 @@ package com.example.notasapp.adapter
 
 import android.text.Html
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -42,15 +43,22 @@ class NotaAdapter(
                     .trim()
                     .replace("\n", " ")
 
-                contenidoTextView.text = if (contenidoTexto.length > 100) {
-                    "${contenidoTexto.substring(0, 100)}..."
+                // Mostrar solo "Text" o un preview corto
+                contenidoTextView.text = if (contenidoTexto.isEmpty()) {
+                    "Text"
+                } else if (contenidoTexto.length > 50) {
+                    "${contenidoTexto.substring(0, 50)}..."
                 } else {
                     contenidoTexto
                 }
 
-                // Formatear fecha
-                val formato = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
-                fechaTextView.text = "Modificado: ${formato.format(nota.fechaModificacion)}"
+                // Ocultar la fecha según el diseño
+                fechaTextView.visibility = View.GONE
+
+                // Si quieres mostrar la fecha, descomenta esto:
+                // fechaTextView.visibility = View.VISIBLE
+                // val formato = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+                // fechaTextView.text = "Modificado: ${formato.format(nota.fechaModificacion)}"
 
                 // Click listeners
                 root.setOnClickListener { onNotaClick(nota) }

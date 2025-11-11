@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="glass_background">#1AFFFFFF</color>
-    <color name="glass_stroke">#33FFFFFF</color>
+    <!-- Colores glass effect para modo oscuro -->
+    <color name="glass_background">#1A000000</color>
+    <color name="glass_stroke">#33000000</color>
+
+    <!-- Colores para buscador - MODO OSCURO -->
+    <color name="search_background">#2C2C2C</color>
+    <color name="search_border">#424242</color>
+
+    <!-- Colores para botones del editor - MODO OSCURO -->
+    <color name="editor_button_selected">#424242</color>
+    <color name="editor_button_pressed">#2C2C2C</color>
 </resources>

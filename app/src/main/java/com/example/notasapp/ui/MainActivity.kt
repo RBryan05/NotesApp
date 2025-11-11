@@ -7,7 +7,7 @@ import android.text.TextWatcher
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.notasapp.adapter.NotaAdapter
 import com.example.notasapp.databinding.ActivityMainBinding
 import com.example.notasapp.viewmodel.NotaViewModel
@@ -23,16 +23,11 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setupToolbar()
+        // Ya no necesitamos setupToolbar() porque usamos un TextView simple
         setupRecyclerView()
         setupFAB()
         setupSearch()
         observeNotas()
-    }
-
-    private fun setupToolbar() {
-        setSupportActionBar(binding.toolbar)
-        supportActionBar?.title = "Mis Notas"
     }
 
     private fun setupRecyclerView() {
@@ -50,7 +45,8 @@ class MainActivity : AppCompatActivity() {
         )
 
         binding.recyclerView.apply {
-            layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+            // Cambiado a LinearLayoutManager (lista vertical simple)
+            layoutManager = LinearLayoutManager(this@MainActivity)
             adapter = this@MainActivity.adapter
             setHasFixedSize(true)
         }

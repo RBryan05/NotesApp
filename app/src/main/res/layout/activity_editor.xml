@@ -5,131 +5,205 @@
     android:layout_height="match_parent"
     android:background="?attr/colorSurface">
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_marginTop="20px"
-        android:layout_marginHorizontal="30px"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@drawable/glass_effect"
-        android:elevation="8dp"
-        app:navigationIcon="@drawable/ic_back"
-        app:menu="@menu/menu_editor"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/tituloLayout"
+    <!-- Toolbar superior con botones -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/topBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:minHeight="64dp"
-        android:paddingVertical="8dp"
-        app:boxBackgroundColor="@color/glass_background"
-        app:boxCornerRadiusBottomEnd="12dp"
-        app:boxCornerRadiusBottomStart="12dp"
-        app:boxCornerRadiusTopEnd="12dp"
-        app:boxCornerRadiusTopStart="12dp"
-        app:layout_constraintTop_toBottomOf="@id/toolbar">
+        android:padding="16dp"
+        app:layout_constraintTop_toTopOf="parent">
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/tituloEditText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Título"
-            android:gravity="center_vertical"
-            android:padding="16dp"
-            android:textSize="18sp" />
+        <!-- Botón de retroceso -->
+        <ImageButton
+            android:id="@+id/backButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_back"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
 
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <HorizontalScrollView
-        android:id="@+id/toolbarEditor"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="8dp"
-        android:background="@drawable/glass_effect"
-        android:padding="8dp"
-        app:layout_constraintTop_toBottomOf="@id/tituloLayout">
-
-        <LinearLayout
+        <!-- Botón eliminar -->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/deleteButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_marginEnd="8dp"
+            android:src="@drawable/ic_delete"
+            android:contentDescription="Eliminar"
+            app:tint="@android:color/white"
+            app:backgroundTint="#F44336"
+            app:fabSize="mini"
+            app:layout_constraintEnd_toStartOf="@id/saveButton"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
 
-            <ImageButton
-                android:id="@+id/boldButton"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginEnd="4dp"
-                android:background="@drawable/editor_button_selector"
-                android:src="@drawable/ic_bold" />
+        <!-- Botón guardar (FAB pequeño amarillo) -->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/saveButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_save"
+            app:backgroundTint="#FFC107"
+            app:tint="@android:color/white"
+            app:fabSize="mini"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
 
-            <ImageButton
-                android:id="@+id/italicButton"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginEnd="4dp"
-                android:background="@drawable/editor_button_selector"
-                android:src="@drawable/ic_italic" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <ImageButton
-                android:id="@+id/underlineButton"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginEnd="4dp"
-                android:background="@drawable/editor_button_selector"
-                android:src="@drawable/ic_underline" />
+    <!-- Campo de título -->
+    <EditText
+        android:id="@+id/tituloEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginTop="16dp"
+        android:background="@android:color/transparent"
+        android:hint="Nota nueva"
+        android:textColorHint="?attr/colorOnSurfaceVariant"
+        android:textColor="?attr/colorOnSurface"
+        android:textSize="24sp"
+        android:inputType="textCapSentences"
+        android:maxLines="1"
+        app:layout_constraintTop_toBottomOf="@id/topBar" />
 
-            <View
-                android:layout_width="1dp"
-                android:layout_height="match_parent"
-                android:layout_marginHorizontal="8dp"
-                android:background="?attr/colorOutline" />
-
-            <ImageButton
-                android:id="@+id/alignLeftButton"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginEnd="4dp"
-                android:background="@drawable/editor_button_selector"
-                android:src="@drawable/ic_align_left" />
-
-            <ImageButton
-                android:id="@+id/alignCenterButton"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginEnd="4dp"
-                android:background="@drawable/editor_button_selector"
-                android:src="@drawable/ic_align_center" />
-
-            <ImageButton
-                android:id="@+id/alignRightButton"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginEnd="4dp"
-                android:background="@drawable/editor_button_selector"
-                android:src="@drawable/ic_align_right" />
-
-            <ImageButton
-                android:id="@+id/justifyButton"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:background="@drawable/editor_button_selector"
-                android:src="@drawable/ic_justify" />
-
-        </LinearLayout>
-
-    </HorizontalScrollView>
-
+    <!-- Editor de texto enriquecido -->
     <jp.wasabeef.richeditor.RichEditor
         android:id="@+id/richEditor"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_margin="16dp"
-        android:background="@drawable/glass_effect"
-        android:padding="16dp"
-        app:layout_constraintTop_toBottomOf="@id/toolbarEditor"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp"
+        android:background="@android:color/transparent"
+        app:layout_constraintTop_toBottomOf="@id/tituloEditText"
+        app:layout_constraintBottom_toTopOf="@id/toolbarContainer" />
+
+    <!-- ProgressBar -->
+    <ProgressBar
+        android:id="@+id/loadingProgress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminateTint="#FFC107"
+        app:layout_constraintTop_toTopOf="@id/richEditor"
+        app:layout_constraintBottom_toBottomOf="@id/richEditor"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Contenedor con borde para la toolbar -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/toolbarContainer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="0dp"
+        app:strokeWidth="1dp"
+        app:strokeColor="?attr/colorOutline"
+        app:cardBackgroundColor="?attr/colorSurface"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- Toolbar de edición -->
+        <HorizontalScrollView
+            android:id="@+id/editorToolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="12dp"
+            android:paddingHorizontal="16dp"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <!-- Alineación izquierda -->
+                <ImageButton
+                    android:id="@+id/alignLeftButton"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginEnd="4dp"
+                    android:background="@drawable/editor_button_selector"
+                    android:src="@drawable/ic_align_left"/>
+
+                <!-- Alineación centro -->
+                <ImageButton
+                    android:id="@+id/alignCenterButton"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginEnd="4dp"
+                    android:background="@drawable/editor_button_selector"
+                    android:src="@drawable/ic_align_center"/>
+
+                <!-- Alineación derecha -->
+                <ImageButton
+                    android:id="@+id/alignRightButton"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginEnd="4dp"
+                    android:background="@drawable/editor_button_selector"
+                    android:src="@drawable/ic_align_right"/>
+
+                <!-- Justificar -->
+                <ImageButton
+                    android:id="@+id/justifyButton"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginEnd="16dp"
+                    android:background="@drawable/editor_button_selector"
+                    android:src="@drawable/ic_justify"/>
+
+                <!-- Separador vertical -->
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="32dp"
+                    android:layout_marginEnd="16dp"
+                    android:background="?attr/colorOutline" />
+
+                <!-- Texto normal (A) -->
+                <TextView
+                    android:id="@+id/normalTextButton"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginEnd="4dp"
+                    android:background="@drawable/editor_button_selector"
+                    android:gravity="center"
+                    android:text="A"
+                    android:textSize="20sp"
+                    android:textStyle="normal"
+                    android:textColor="?attr/colorOnSurface" />
+
+                <!-- Negrita -->
+                <ImageButton
+                    android:id="@+id/boldButton"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginEnd="4dp"
+                    android:background="@drawable/editor_button_selector"
+                    android:src="@drawable/ic_bold"/>
+
+                <!-- Cursiva -->
+                <ImageButton
+                    android:id="@+id/italicButton"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="@drawable/editor_button_selector"
+                    android:src="@drawable/ic_italic"/>
+
+            </LinearLayout>
+
+        </HorizontalScrollView>
+
+    </com.google.android.material.card.MaterialCardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
